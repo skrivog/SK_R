@@ -1,0 +1,280 @@
+---
+title: "SK_R_Project"
+output: html_document
+date: "2025-03-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+url <- "https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2025/refs/heads/main/assignments/UNIX_Assignment/transposed_genotypes.txt"
+download.file(url, destfile = "Transposed_genotypes.txt", method = "auto")
+file.exists("Transposed_genotypes.txt")
+lines <- readLines("Transposed_genotypes.txt")
+transposed_noheader <- lines[-(1:2)]
+writeLines(transposed_noheader, "transposed_noheader.txt")
+lines <- readLines("transposed_noheader.txt")
+lines_modified <- gsub("Group", "SNP_ID", lines)
+writeLines(lines_modified, "transposed_noheader.txt") #makes a file
+url <- "https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2025/refs/heads/main/assignments/UNIX_Assignment/snp_position.txt"
+download.file(url, destfile = "snp_positions.txt", method = "auto")
+file.exists("snp_positions.txt")
+
+header_data <- read.table("transposed_noheader.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+snp_data <- read.table("snp_positions.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+merged_data <- merge(snp_data, header_data, by = "SNP_ID")
+View(merged_data)
+write.table(merged_data, file = "merged_data.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+lines <- readLines("merged_data.txt")
+for (line in lines) {
+       fields <- strsplit(line, "\\s+")[[1]]
+   for (i in seq_along(fields)) {
+         if (fields[i] == "ZMMIL") {
+           cat("Found at column", i, "\n")        }
+     }
+   } #Found at line 1 column 2508
+for (i in seq_along(fields)) {
+  if (fields[i] == "ZMMIL") {
+    cat("Found at line", line_num, "column", i, "\n")
+    }
+} 
+lines <- readLines("merged_data.txt")
+ for (line_num in seq_along(lines)) {
+       # Split the current line into fields based on whitespace
+         fields <- strsplit(lines[line_num], "\\s+")[[1]]
+     for (i in seq_along(fields)) {
+           if (fields[i] == "ZMMLR") {
+                 cat("Found at line", line_num, "column", i, "\n")
+             }
+       }
+     } #Found at line 1 column 1225
+lines <- readLines("merged_data.txt")
+ for (line_num in seq_along(lines)) 
+         fields <- strsplit(lines[line_num], "\\s+")[[1]]
+     for (i in seq_along(fields)) {
+           if (fields[i] == "ZMMMR") {
+                 cat("Found at line", line_num, "column", i, "\n") } } 
+         
+df <- read.table("merged_data.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+cols_to_keep <- c(1, 3, 4, 2508:2797, 1225:2480, 2481:2507)
+maize_df <- df[, cols_to_keep]
+write.table(maize_df, file = "maize.txt", sep = "\t", row.names = FALSE, quote = FALSE) #moves the data into a combined maize file
+maize_df <- read.table("maize.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+maize_df[[3]] <- as.numeric(maize_df[[3]])
+maize_df_sorted <- maize_df[order(maize_df[[3]]), ]
+write.table(maize_df_sorted, file = "maize_sort.txt", sep = "\t", row.names = FALSE, quote = FALSE) #sorts the data and creates a file
+header <- readLines("maize.txt", n = 1)
+data <- read.table("maize.txt", header = FALSE, sep = "\t", skip = 1, stringsAsFactors = FALSE)
+data_sorted <- data[order(as.numeric(data[[3]])), ]
+writeLines(header, "Maize_sorted.txt")
+write.table(data_sorted, file = "Maize_sorted.txt", sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE, append = TRUE)
+data <- read.delim("Maize_sorted.txt", header = FALSE, comment.char = "#", stringsAsFactors = FALSE)
+col2 <- data[, 2]
+col2_sorted <- sort(col2)
+counts <- table(col2_sorted)
+print(counts)
+maize_df <- read.table("Maize_sorted.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+maize_df[[2]] <- as.numeric(maize_df[[2]])
+for (ch in 1:10) {
+         subset_df <- maize_df[maize_df[[2]] == ch, ]
+     output_file <- paste0("Maize_chr", ch, ".txt")
+     write.table(subset_df, file = output_file, sep = "\t", row.names = FALSE, quote = FALSE)
+     cat("Created file:", output_file, "\n")
+     }
+maize_df <- read.table("Maize_sorted.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+maize_multiple <- maize_df[maize_df[[2]] == "multiple", ]
+write.table(maize_multiple, file = "Maize_multiple.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+maize_unknown <- maize_df[maize_df[[2]] == "unknown", ]
+write.table(maize_unknown, file = "Maize_unknown.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+lines <- readLines("Maize_sorted.txt")
+lines_modified <- gsub("?", "-", lines, fixed = TRUE)
+writeLines(lines_modified, "Maize_hyphen.txt")
+if (!dir.exists("Maize_increasing.txt")) {
+       dir.create("Maize_increasing.txt")
+  }
+files_to_move <- c("Maize_chr1.txt", "Maize_chr2.txt", "Maize_chr3.txt", "Maize_chr4.txt",
+                                         "Maize_chr5.txt", "Maize_chr6.txt", "Maize_chr7.txt", "Maize_chr8.txt",
+                                         "Maize_chr9.txt", "Maize_chr10.txt", "Maize_multiple.txt", "Maize_unknown.txt")
+for (f in files_to_move) {
+       dest <- file.path("Maize_increasing.txt", f)
+       file.rename(f, dest)
+       cat("Moved", f, "to", dest, "\n")
+       }
+if (!dir.exists("Maize_decreasing.txt")) {
+       dir.create("Maize_decreasing.txt")
+   }
+file.rename("Maize_hyphen.txt", file.path("Maize_decreasing.txt", "Maize_hyphen.txt"))
+input_file <- file.path("Maize_decreasing.txt", "Maize_hyphen.txt")
+df <- read.table(input_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+df[[3]] <- as.numeric(df[[3]])
+df_sorted <- df[order(-df[[3]]), ]
+output_file <- file.path("Maize_decreasing.txt", "Maize_decreasing10.txt")
+write.table(df_sorted, file = output_file, sep = "\t", row.names = FALSE, quote = FALSE)
+ 
+cat("Created sorted file:", output_file, "\n")
+input_file <- file.path("Maize_decreasing.txt", "Maize_decreasing10.txt")
+if (!file.exists(input_file)) {
+       stop("File not found: ", input_file)
+  }
+maize_data <- read.table(input_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+for (chr in 1:10) {
+       subset_data <- maize_data[maize_data[[2]] == chr, ]
+   outfile <- file.path("Maize_decreasing.txt", paste0("Maize_dchr", chr, ".txt"))
+   write.table(subset_data, file = outfile, sep = "\t", row.names = FALSE, quote = FALSE)
+   
+     cat("Created file:", outfile, "\n")
+   }
+df <- read.table("merged_data.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+cols_to_keep <- c(1, 3, 4, 89:988, 1178:1218, 989:1022)
+teo_df <- df[, cols_to_keep]
+write.table(teo_df, file = "teo.txt", sep = "\t", row.names = FALSE, quote = FALSE) #moves the data into a combined teo file
+ 
+ teo_df <- read.table("teo.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+teo_df[[3]] <- as.numeric(teo_df[[3]])
+teo_df_sorted <- teo_df[order(teo_df[[3]]), ]
+write.table(maize_df_sorted, file = "teo_sort.txt", sep = "\t", row.names = FALSE, quote = FALSE) #sorts the data and creates a file
+ 
+header <- readLines("teo.txt", n = 1)
+data <- read.table("teo.txt", header = FALSE, sep = "\t", skip = 1, stringsAsFactors = FALSE)
+data_sorted <- data[order(as.numeric(data[[3]])), ]
+writeLines(header, "Teo_sorted.txt")
+write.table(data_sorted, file = "Teo_sorted.txt", sep = "\t",
+                                        row.names = FALSE, col.names = FALSE, quote = FALSE, append = TRUE)
+data <- read.delim("Teo_sorted.txt", header = FALSE, comment.char = "#", stringsAsFactors = FALSE)
+col2 <- data[, 2]
+col2_sorted <- sort(col2)
+counts <- table(col2_sorted)
+print(counts)
+teo_df <- read.table("Teo_sorted.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+ 
+   teo_df[[2]] <- as.numeric(teo_df[[2]])
+for (ch in 1:10) {
+         subset_df <- teo_df[teo_df[[2]] == ch, ]
+     output_file <- paste0("Teo_chr", ch, ".txt")
+     write.table(subset_df, file = output_file, sep = "\t", row.names = FALSE, quote = FALSE)
+     
+       cat("Created file:", output_file, "\n")
+       }
+teo_df <- read.table("Teo_sorted.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+teo_multiple <- teo_df[teo_df[[2]] == "multiple", ]
+write.table(teo_multiple, file = "Teo_multiple.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+teo_unknown <- teo_df[teo_df[[2]] == "unknown", ]
+write.table(teo_unknown, file = "Teo_unknown.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+lines <- readLines("Teo_sorted.txt")
+lines_modified <- gsub("?", "-", lines, fixed = TRUE)
+ writeLines(lines_modified, "Teo_hyphen.txt")
+
+#Making Graphs
+#SNPs per Chromosome Maize 
+snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
+colnames(snp_counts) <- c("Chromosome", "SNP_Count")
+
+ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
+       geom_bar(stat = "identity") +
+       labs(title = "SNPs per Chromosome in Maize", x = "Chromosome", y = "Number of SNPs") +
+       theme_minimal()
+
+#SNPs per Chromosome Teosinte
+snp_counts_teosinte <- as.data.frame(table(teo_df_sorted$Chromosome))
+ colnames(snp_counts_teosinte) <- c("Chromosome", "SNP_Count")
+ 
+ ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
+     geom_bar(stat = "identity") + labs(title = "SNPs per Chromosome in Teosinte", x = "Chromosome", y = "Number of SNPs") + theme_minimal()
+ 
+ 
+ #SNPS per Chromosome Maize and Teosinte 
+ maize_snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
+  maize_snp_counts$Species <- "Maize"
+  teosinte_snp_counts <- as.data.frame(table(teo_df_sorted$Chromosome))
+  teosinte_snp_counts$Species <- "Teosinte"
+  snp_comparison <- rbind(maize_snp_counts, teosinte_snp_counts)
+  colnames(snp_comparison) <- c("Chromosome", "SNP_Count", "Species")
+  ggplot(snp_comparison, aes(x = Chromosome, y = SNP_Count, fill = Species)) +
+        geom_bar(stat = "identity", position = "dodge") +
+        labs(title = "SNPs per Chromosome in Maize vs Teosinte", x = "Chromosome", y = "Number of SNPs") +
+        theme_minimal()
+  
+  #Own Visualization -- Density
+ggplot(maize_df_sorted, aes(x = as.numeric(Position))) +
+    geom_density(fill = "blue", alpha = 0.5) +
+    labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "Density") +
+    theme_minimal() #plots a graph showing SNP density per chromosome in Maize
+  
+ggplot(teo_df_sorted, aes(x = as.numeric(Position))) +
+    geom_density(fill = "blue", alpha = 0.5) +
+    labs(title = "Density of SNP Positions in Teosinte", x = "Genomic Position", y = "Density") +
+    theme_minimal()
+  
+  
+  #Missing Data
+  
+  library(tidyverse)
+  process_and_plot <- function(df, group_label) {
+    long_df <- df %>%
+               pivot_longer(
+                     cols = 4:ncol(df),
+                     names_to = "Sample",
+                     values_to = "Genotype"
+                 ) %>%
+       mutate(Zygosity = case_when(
+             is.na(Genotype) | Genotype == "." ~ "Missing",
+             Genotype %in% c("A/A", "C/C", "G/G", "T/T") ~ "Homozygous",
+             TRUE ~ "Heterozygous"
+         ))
+    p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
+           geom_bar(position = "fill") +
+           labs(
+                 title = paste("Proportion of Zygosity Types per Sample (", group_label, ")", sep = ""),
+                 x = "Sample", y = "Proportion"
+             ) +
+           theme(axis.text.x = element_text(angle = 45, hjust = 1))
+     print(p)
+     }
+  process_and_plot(maize_df_sorted, "Maize") #prints the graph for Maize
+  
+  process_and_plot(teo_df_sorted, "Teosinte") #prints the graph for Teosinte
+
+  ##Inspection of Files
+  
+  url <- "https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2025/refs/heads/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt"
+    download.file(url, destfile = "fang_et_al_genotypes.txt", method = "auto")
+  
+  file.exists("fang_et_al_genotypes.txt")
+  
+  file.info("fang_et_al_genotypes.txt")$size
+  file.info("snp_positions.txt")$size
+  
+  fang_data <- read.table("fang_et_al_genotypes.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+ cat("Column names:\n")
+  print(colnames(fang_data))
+  cat("Number of columns:", ncol(fang_data), "\n")
+  
+  snp_positions <- read.table("snp_positions.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+  
+  cat("Total number of columns:", ncol(snp_positions), "\n")
+  
+  #lines of files using sapply 
+  files <- c("fang_et_al_genotypes.txt", "snp_positions.txt")
+ line_counts <- sapply(files, function(f) length(readLines(f)))
+ print(line_counts)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
