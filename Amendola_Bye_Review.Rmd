@@ -1,0 +1,29 @@
+---
+title: "Amendola_Bye_Review"
+output: html_document
+---
+
+# General comments
+There's a lot of intermediate files in the directory, most of these don't need to be output as .txt files and can just exist as data frames within the R project so the directory won't be as cluttered. I noticed it looks like you're writing files and then reading them at a later step - keeping it as a data frame can eliminate this extra read step
+
+You have one single chunk in your .Rmd file - splitting the code into smaller chunks can help make it more readable and also help with troubleshooting, so you can work on one section at a time. Adding comments to the chunks or sections of code helps as well
+
+On line 26, you have view(merged_data) - this can probably be removed
+# Loading packages
+I would recommend adding these lines to the beginning of your script
+
+rm(list=ls())
+library(tidyverse)
+
+The first one clears the environment every time you run the script.
+The second line ensures all the tidyverse packages are loaded every time you run the script - I used the run all function and got an error when trying to make the plots as ggplot wasn't loaded when I opened RStudio
+
+# Result files
+I looked at the .txt files for the teosinte chromosomes and it looks like they only contain the SNP_ID column - no SNP information is present. The maize .txt files look fine so something must be causing an issue with extracting the teosinte SNPs. 
+
+# Data visualization
+For the plots for number of maize or teosinte SNPs per chromosome, you can use as.numeric(Chromosome) for the x axis so it sorts numerically
+
+For the zygosity plots by sample, you can remove the x axis labels to clean it up as there's so many and they blur into each other - you can use theme(axis.text.x = element_blank())
+
+For the maize and teosinte SNP density plots, one thing to consider is that the chromosomes decrease in length from 1-10 and as such it may not make as much sense to plot all maize or teosinte SNP densities in one chart as opposed to plotting SNP densities across each chromosome 
