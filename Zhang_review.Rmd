@@ -1,0 +1,18 @@
+---
+title: "Zhang_review"
+output: pdf_document
+---
+
+
+## Comments
+
+- The data are easy to locate in the GitHub repository.
+- The `.Rmd` file runs successfully in my local environment.
+- I really like how you included separate plots for maize and teosinte, as well as a combined plot showing both — that helps with clarity.
+- There's one issue in the *SNPs per Chromosome in Maize* and *SNPs per Chromosome in Teosinte* plots:  
+  The chromosomes on the x-axis are not sorted in ascending order (e.g., Chromosome 10 appears between Chromosome 1 and 2).  
+  This can be fixed by converting the chromosome labels to numeric using `as.numeric` before plotting.
+
+---
+
+Nice work overall — it’s clear and well-organized.
