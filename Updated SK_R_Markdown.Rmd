@@ -251,9 +251,7 @@ writeLines(lines_modified, "Teo_hyphen.txt")
 #SNPs per Chromosome Maize 
 
 ls() 
-#To install the ggplot2 package
-install.packages("ggplot2")
-library(ggplot2)
+
 snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
 colnames(snp_counts) <- c("Chromosome", "SNP_Count")
 snp_counts$Chromosome <- factor(snp_counts$Chromosome, 
@@ -269,9 +267,12 @@ ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
 
 #SNPs per Chromosome Teosinte
 
-teo_df_sorted$Chromosome <- factor(teo_df_sorted$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
+teo_snp_counts <- as.data.frame(table(teo_df_sorted$Chromosome))
+colnames(teo_snp_counts) <- c("Chromosome", "SNP_Count")
+teo_snp_counts$Chromosome <- factor(teo_snp_counts$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
 
-ggplot(teo_df_sorted, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
+
+ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
   geom_bar(stat = "identity") +
   labs(title = "SNPs per Chromosome in Teosinte", x = "Chromosome", y = "Number of SNPs") +
   theme_minimal() +
@@ -302,7 +303,7 @@ labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "D
 theme_minimal()
 
 chromosome_levels <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "multiple", "unknown")
-maize_df_sorted$Chromosome <- factor(merged_data_subset$Chromosome, levels = chromosome_levels)
+maize_df_sorted$Chromosome <- factor(maize_df_sorted$Chromosome, levels = chromosome_levels)
 
 ggplot(maize_df_sorted, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs(title = "Density of SNP Positions in Maize by Chromosome", x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
