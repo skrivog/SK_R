@@ -254,7 +254,7 @@ ls()
 #To install the ggplot2 package
 install.packages("ggplot2")
 library(ggplot2)
-snp_counts <- as.data.frame(table(merged_data_subset$Chromosome))
+snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
 colnames(snp_counts) <- c("Chromosome", "SNP_Count")
 snp_counts$Chromosome <- factor(snp_counts$Chromosome, 
                                 levels = c(as.character(1:10), "multiple", "unknown"),
@@ -269,7 +269,7 @@ ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
 
 #SNPs per Chromosome Teosinte
 
-snp_counts_teosinte$Chromosome <- factor(snp_counts_teosinte$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
+snp_counts_teosinte$Chromosome <- factor(teo_df_sorted$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
 
 ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
   geom_bar(stat = "identity") +
@@ -279,9 +279,9 @@ ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome
  
  #SNPS per Chromosome Maize and Teosinte 
 
-maize_snp_counts <- as.data.frame(table(merged_data_subset$Chromosome))
+maize_snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
 maize_snp_counts$Species <- "Maize"
-teosinte_snp_counts <- as.data.frame(table(merged_teosinte_data$Chromosome))
+teosinte_snp_counts <- as.data.frame(table(teo_df_sorted$Chromosome))
 teosinte_snp_counts$Species <- "Teosinte"
 snp_comparison <- rbind(maize_snp_counts, teosinte_snp_counts)
 colnames(snp_comparison) <- c("Chromosome", "SNP_Count", "Species")
@@ -296,23 +296,23 @@ theme_minimal() +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
 #Own Visualization -- Density
 
-ggplot(merged_data_subset, aes(x = as.numeric(Position))) +
+ggplot(maize_df_sorted, aes(x = as.numeric(Position))) +
 geom_density(fill = "blue", alpha = 0.5) +
 labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "Density") +
 theme_minimal()
 
 chromosome_levels <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "multiple", "unknown")
-merged_data_subset$Chromosome <- factor(merged_data_subset$Chromosome, levels = chromosome_levels)
+maize_df_sorted$Chromosome <- factor(merged_data_subset$Chromosome, levels = chromosome_levels)
 
-ggplot(merged_data_subset, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs(title = "Density of SNP Positions in Maize by Chromosome", x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(maize_df_sorted, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs(title = "Density of SNP Positions in Maize by Chromosome", x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot(merged_teosinte_data, aes(x = as.numeric(Position))) +
+ggplot(teo_df_sorted, aes(x = as.numeric(Position))) +
 geom_density(fill = "blue", alpha = 0.5) +
 labs(title = "Density of SNP Positions in Teosinte", x = "Genomic Position", y = "Density") +
 theme_minimal()
 
 #Sort density of Teosinte by chromosomes
-ggplot(merged_teosinte_data, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs (title = "Density of SNP Positions in Teosinte by Chromosome", 
+ggplot(teo_df_sorted, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs (title = "Density of SNP Positions in Teosinte by Chromosome", 
 x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
   
 #Missing Data
@@ -344,8 +344,8 @@ p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
   print(p)
 }
 
-process_and_plot(merged_data_subset, "Maize")
-process_and_plot(merged_teosinte_data, "Teosinte")
+process_and_plot(maize_df_sorted, "Maize")
+process_and_plot(teo_df_sorted, "Teosinte")
 
 ##Inspection of Files
   
