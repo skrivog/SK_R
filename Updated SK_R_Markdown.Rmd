@@ -249,75 +249,105 @@ writeLines(lines_modified, "Teo_hyphen.txt")
 
 #Making Graphs
 #SNPs per Chromosome Maize 
-snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
+
+ls() 
+#To install the ggplot2 package
+install.packages("ggplot2")
+library(ggplot2)
+snp_counts <- as.data.frame(table(merged_data_subset$Chromosome))
 colnames(snp_counts) <- c("Chromosome", "SNP_Count")
+snp_counts$Chromosome <- factor(snp_counts$Chromosome, 
+                                levels = c(as.character(1:10), "multiple", "unknown"),
+                                ordered = TRUE)
 
 ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
-       geom_bar(stat = "identity") +
-       labs(title = "SNPs per Chromosome in Maize", x = "Chromosome", y = "Number of SNPs") +
-       theme_minimal()
+  geom_bar(stat = "identity") +
+  labs(title = "SNPs per Chromosome in Maize", x = "Chromosome", y = "Number of SNPs") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 #SNPs per Chromosome Teosinte
-snp_counts_teosinte <- as.data.frame(table(teo_df_sorted$Chromosome))
- colnames(snp_counts_teosinte) <- c("Chromosome", "SNP_Count")
- 
- ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
-     geom_bar(stat = "identity") + labs(title = "SNPs per Chromosome in Teosinte", x = "Chromosome", y = "Number of SNPs") + theme_minimal()
- 
+
+snp_counts_teosinte$Chromosome <- factor(snp_counts_teosinte$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
+
+ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
+  geom_bar(stat = "identity") +
+  labs(title = "SNPs per Chromosome in Teosinte", x = "Chromosome", y = "Number of SNPs") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
  
  #SNPS per Chromosome Maize and Teosinte 
- maize_snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
-  maize_snp_counts$Species <- "Maize"
-  teosinte_snp_counts <- as.data.frame(table(teo_df_sorted$Chromosome))
-  teosinte_snp_counts$Species <- "Teosinte"
-  snp_comparison <- rbind(maize_snp_counts, teosinte_snp_counts)
-  colnames(snp_comparison) <- c("Chromosome", "SNP_Count", "Species")
-  ggplot(snp_comparison, aes(x = Chromosome, y = SNP_Count, fill = Species)) +
-        geom_bar(stat = "identity", position = "dodge") +
-        labs(title = "SNPs per Chromosome in Maize vs Teosinte", x = "Chromosome", y = "Number of SNPs") +
-        theme_minimal()
-  
-  #Own Visualization -- Density
-ggplot(maize_df_sorted, aes(x = as.numeric(Position))) +
-    geom_density(fill = "blue", alpha = 0.5) +
-    labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "Density") +
-    theme_minimal() #plots a graph showing SNP density per chromosome in Maize
-  
-ggplot(teo_df_sorted, aes(x = as.numeric(Position))) +
-    geom_density(fill = "blue", alpha = 0.5) +
-    labs(title = "Density of SNP Positions in Teosinte", x = "Genomic Position", y = "Density") +
-    theme_minimal()
-  
-  
-  #Missing Data
-  
-  library(tidyverse)
-  process_and_plot <- function(df, group_label) {
-    long_df <- df %>%
-               pivot_longer(
-                     cols = 4:ncol(df),
-                     names_to = "Sample",
-                     values_to = "Genotype"
-                 ) %>%
-       mutate(Zygosity = case_when(
-             is.na(Genotype) | Genotype == "." ~ "Missing",
-             Genotype %in% c("A/A", "C/C", "G/G", "T/T") ~ "Homozygous",
-             TRUE ~ "Heterozygous"
-         ))
-    p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
-           geom_bar(position = "fill") +
-           labs(
-                 title = paste("Proportion of Zygosity Types per Sample (", group_label, ")", sep = ""),
-                 x = "Sample", y = "Proportion"
-             ) +
-           theme(axis.text.x = element_text(angle = 45, hjust = 1))
-     print(p)
-     }
-  process_and_plot(maize_df_sorted, "Maize") #prints the graph for Maize
-  
-  process_and_plot(teo_df_sorted, "Teosinte") #prints the graph for Teosinte
 
-  ##Inspection of Files
+maize_snp_counts <- as.data.frame(table(merged_data_subset$Chromosome))
+maize_snp_counts$Species <- "Maize"
+teosinte_snp_counts <- as.data.frame(table(merged_teosinte_data$Chromosome))
+teosinte_snp_counts$Species <- "Teosinte"
+snp_comparison <- rbind(maize_snp_counts, teosinte_snp_counts)
+colnames(snp_comparison) <- c("Chromosome", "SNP_Count", "Species")
+
+snp_comparison$Chromosome <- factor(snp_comparison$Chromosome, 
+                                levels = c(as.character(1:10), "multiple", "unknown"),
+                                ordered = TRUE)
+ggplot(snp_comparison, aes(x = Chromosome, y = SNP_Count, fill = Species)) +
+geom_bar(stat = "identity", position = "dodge") +
+labs(title = "SNPs per Chromosome in Maize vs Teosinte", x = "Chromosome", y = "Number of SNPs") +
+theme_minimal() +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+#Own Visualization -- Density
+
+ggplot(merged_data_subset, aes(x = as.numeric(Position))) +
+geom_density(fill = "blue", alpha = 0.5) +
+labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "Density") +
+theme_minimal()
+
+chromosome_levels <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "multiple", "unknown")
+merged_data_subset$Chromosome <- factor(merged_data_subset$Chromosome, levels = chromosome_levels)
+
+ggplot(merged_data_subset, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs(title = "Density of SNP Positions in Maize by Chromosome", x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(merged_teosinte_data, aes(x = as.numeric(Position))) +
+geom_density(fill = "blue", alpha = 0.5) +
+labs(title = "Density of SNP Positions in Teosinte", x = "Genomic Position", y = "Density") +
+theme_minimal()
+
+#Sort density of Teosinte by chromosomes
+ggplot(merged_teosinte_data, aes(x = as.numeric(Position))) + geom_density(fill = "blue", alpha = 0.5) + facet_wrap(~ Chromosome, scales = "free_x", ncol = 5) + labs (title = "Density of SNP Positions in Teosinte by Chromosome", 
+x = "Genomic Position", y = "Density") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  
+#Missing Data
+
+library(tidyverse)
+process_and_plot <- function(df, group_label) {
+long_df <- df %>%
+    pivot_longer(
+      cols = 4:ncol(df),
+      names_to = "Sample",
+      values_to = "Genotype"
+    ) %>%
+    # Create a new column to indicate zygosity
+    mutate(Zygosity = case_when(
+      is.na(Genotype) | Genotype == "." ~ "Missing",
+      Genotype %in% c("A/A", "C/C", "G/G", "T/T") ~ "Homozygous",
+      TRUE ~ "Heterozygous"
+    ))
+
+p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
+    geom_bar(position = "fill") +
+    labs(
+      title = paste("Proportion of Zygosity Types per Sample (", group_label, ")", sep = ""),
+      x = "Sample", y = "Proportion"
+    ) +
+  theme(axis.text.x=element_blank())
+
+  
+  print(p)
+}
+
+process_and_plot(merged_data_subset, "Maize")
+process_and_plot(merged_teosinte_data, "Teosinte")
+
+##Inspection of Files
   
   url <- "https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2025/refs/heads/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt"
     download.file(url, destfile = "fang_et_al_genotypes.txt", method = "auto")
