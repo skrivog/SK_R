@@ -246,58 +246,50 @@ lines_modified <- gsub("?", "-", lines, fixed = TRUE)
 
 writeLines(lines_modified, "Teo_hyphen.txt")
 
-#Making Graphs
 
+#Making Graphs
 #SNPs per Chromosome Maize 
 snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
 colnames(snp_counts) <- c("Chromosome", "SNP_Count")
 
-graph1 <- ggplot(snp_counts, aes(x = as.numeric(Chromosome), y = SNP_Count, fill = Chromosome)) +
+ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
        geom_bar(stat = "identity") +
        labs(title = "SNPs per Chromosome in Maize", x = "Chromosome", y = "Number of SNPs") +
        theme_minimal()
-print(graph1)
 
 #SNPs per Chromosome Teosinte
 snp_counts_teosinte <- as.data.frame(table(teo_df_sorted$Chromosome))
  colnames(snp_counts_teosinte) <- c("Chromosome", "SNP_Count")
  
-graph2 <- ggplot(snp_counts_teosinte, aes(x = as.numeric(Chromosome), y = SNP_Count, fill = Chromosome)) +
+ ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
      geom_bar(stat = "identity") + labs(title = "SNPs per Chromosome in Teosinte", x = "Chromosome", y = "Number of SNPs") + theme_minimal()
-print(graph2)
  
  
  #SNPS per Chromosome Maize and Teosinte 
- 
-maize_snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
+ maize_snp_counts <- as.data.frame(table(maize_df_sorted$Chromosome))
   maize_snp_counts$Species <- "Maize"
   teosinte_snp_counts <- as.data.frame(table(teo_df_sorted$Chromosome))
   teosinte_snp_counts$Species <- "Teosinte"
   snp_comparison <- rbind(maize_snp_counts, teosinte_snp_counts)
   colnames(snp_comparison) <- c("Chromosome", "SNP_Count", "Species")
-  
-graph3 <- ggplot(snp_comparison, aes(x = Chromosome, y = SNP_Count, fill = Species)) +
+  ggplot(snp_comparison, aes(x = Chromosome, y = SNP_Count, fill = Species)) +
         geom_bar(stat = "identity", position = "dodge") +
         labs(title = "SNPs per Chromosome in Maize vs Teosinte", x = "Chromosome", y = "Number of SNPs") +
         theme_minimal()
-print(graph3)
   
-#Own Visualization -- Density
-
-graph4 <- ggplot(maize_df_sorted, aes(x = as.numeric(Position))) +
+  #Own Visualization -- Density
+ggplot(maize_df_sorted, aes(x = as.numeric(Position))) +
     geom_density(fill = "blue", alpha = 0.5) +
     labs(title = "Density of SNP Positions in Maize", x = "Genomic Position", y = "Density") +
     theme_minimal() #plots a graph showing SNP density per chromosome in Maize
-print(graph4)
   
-graph5 <- ggplot(teo_df_sorted, aes(x = as.numeric(Position))) +
+ggplot(teo_df_sorted, aes(x = as.numeric(Position))) +
     geom_density(fill = "blue", alpha = 0.5) +
     labs(title = "Density of SNP Positions in Teosinte", x = "Genomic Position", y = "Density") +
     theme_minimal()
-print(graph5)
   
   
-#Missing Data
+  #Missing Data
   
   library(tidyverse)
   process_and_plot <- function(df, group_label) {
@@ -312,15 +304,14 @@ print(graph5)
              Genotype %in% c("A/A", "C/C", "G/G", "T/T") ~ "Homozygous",
              TRUE ~ "Heterozygous"
          ))
-
-p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
+    p <- ggplot(long_df, aes(x = Sample, fill = Zygosity)) +
            geom_bar(position = "fill") +
            labs(
                  title = paste("Proportion of Zygosity Types per Sample (", group_label, ")", sep = ""),
                  x = "Sample", y = "Proportion"
              ) +
            theme(axis.text.x = element_text(angle = 45, hjust = 1))
-print(p)
+     print(p)
      }
   process_and_plot(maize_df_sorted, "Maize") #prints the graph for Maize
   
