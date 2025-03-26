@@ -269,7 +269,7 @@ ggplot(snp_counts, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
 
 #SNPs per Chromosome Teosinte
 
-snp_counts_teosinte$Chromosome <- factor(teo_df_sorted$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
+teo_df_sorted$Chromosome <- factor(teo_df_sorted$Chromosome, levels = c(as.character(1:10), "multiple", "unknown"), ordered = TRUE)
 
 ggplot(snp_counts_teosinte, aes(x = Chromosome, y = SNP_Count, fill = Chromosome)) +
   geom_bar(stat = "identity") +
